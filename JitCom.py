@@ -13,6 +13,8 @@ def JITMaker(mode, numberN, angleZX, angleZY, point, vel):
     f = open('jit.txt', 'w')                                                             #open text-file for JITs
     pointShift = PointMod.pointShift(0,0,0)                                              #just creating an obj
     jit = 'OK \n'
+    jit = jit + printer(PointMod.Modification(point, pointShift, angleZX, angleZY), vel, numberN)
+    
     for case in helper.switch(mode):
         if case('D'): pointShift.__edit__(10, 0, -30)                                    #a pick goes down/ shift (dependes on the strings' positions)
         jit = jit + printer(PointMod.Modification(point, pointShift, angleZX, angleZY), vel, numberN)#creating new JITstring[] about new pick_position 
@@ -29,6 +31,7 @@ def JITMaker(mode, numberN, angleZX, angleZY, point, vel):
         jit = jit + printer(PointMod.Modification(point, pointShift, angleZX, angleZY), vel, numberN)
         break
         if case('DU'): pointShift.__edit__(10, 0, -30)                                   #a pick goes down then goes up
+        print('OK')
         jit = jit + printer(PointMod.Modification(point, pointShift, angleZX, angleZY), vel, numberN)
         pointShift.__edit__(-20, 0, 10)
         jit = jit + printer(PointMod.Modification(point, pointShift, angleZX, angleZY), vel, numberN)
@@ -49,5 +52,6 @@ def JITMaker(mode, numberN, angleZX, angleZY, point, vel):
 
 def Tester():
     pointT = PointMod.point(40, 0, 35, 0, 0, 0)
-    JITMaker('D', 10, 0, 0, pointT, 10000)
+    NumberN = 10;
+    JITMaker('D', NumberN, 0, 0, pointT, 10000) #the angle changes clockwise
     print('OK')

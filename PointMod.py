@@ -18,21 +18,21 @@ class pointShift:
         self.Lz = Lz
 
 def Modification(point, pointShift, angleZX, angleZY): #point rotation
-    cosZX = math.cos(DegToRad(angleZX));
-    sinZX = math.sin(DegToRad(angleZX));
-    cosZY = math.cos(DegToRad(angleZY));
-    sinZY = math.sin(DegToRad(angleZY));
+    cosA = math.cos(DegToRad(angleZX)); #Y-rot
+    sinA = math.sin(DegToRad(angleZX));
+    cosT = math.cos(DegToRad(angleZY)); #X-rot
+    sinT = math.sin(DegToRad(angleZY));
     
-    point.X = (point.X + pointShift.Lx*cosZY +
-               pointShift.Ly*sinZY*sinZX +
-               pointShift.Lz*sinZY*cosZX)
+    point.X = (point.X + pointShift.Lx*cosA*cosT -
+               pointShift.Ly*sinA*sinT +
+               pointShift.Lz*sinA)
 
-    point.Y = (point.Y + pointShift.Ly*cosZX -
-               pointShift.Lz*sinZX)
+    point.Y = (point.Y + pointShift.Lx*sinT -
+               pointShift.Ly*cosT)
 
-    point.Z = (point.Z - pointShift.Lx*sinZX +
-               pointShift.Ly*cosZY*sinZX +
-               pointShift.Lz*cosZY*cosZX)
+    point.Z = (point.Z - pointShift.Lx*sinA*cosT +
+               pointShift.Ly*sinA*sinT +
+               pointShift.Lz*cosA)
     
     return point
 
