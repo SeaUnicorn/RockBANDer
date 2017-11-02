@@ -17,6 +17,8 @@ class switch(object):
             self.fall = True
             return True
         return False
+    def case(*args):
+        return any((arg == switch.value for arg in args))
 
 def DegToRad(angleDeg):
     return (angleDeg*3.1416)/180
