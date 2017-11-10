@@ -7,6 +7,10 @@ class point: #geom.point
           self.A = A #Euler angles
           self.B = B #
           self.C = C #
+      def __edit__(self, X, Y, Z):
+          self.X = X
+          self.Y = Y
+          self.Z = Z  
 class pointShift:
       def __init__(self, Lx, Ly, Lz): #point shift linear
         self.Lx = Lx
