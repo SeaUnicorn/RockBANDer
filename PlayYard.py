@@ -145,7 +145,7 @@ def PlayTabs(strings, angleZX, angleZY, NumberN, mode, point):
     for item in range(0, len(CMDs)):
         G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + ' \n'))
         G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, NumberN, mode, point, 1))
-        G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') + (str('MF1 = ' + str(CMDs[item].duration)+ ' \n'))
+        G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') + (str('G04 ' + str(CMDs[item].duration/1000)+ ' \n'))
 
     return G_CMD
 
