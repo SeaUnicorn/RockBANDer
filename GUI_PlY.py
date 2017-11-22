@@ -1,7 +1,7 @@
 import helper #switch-case 
 import math   #sin/cos
 import PointMod #point (position) and point modification
-import JitCom
+import G_Com
 import PlayYard
 import copy
 try:
@@ -15,7 +15,7 @@ except ImportError:
 
 root = Tk()
 G_CMD = 'NULL'
-jit = 'NONE'
+
 FP = Label (root, text ='First String Position')
 Another = Label (root, text ='angleZX        angleZY        String')
 X = Entry(root, width = 7)
@@ -49,12 +49,12 @@ mode.insert(0, 'D')
 
 def button_clicked():
     answer.delete('1.0', END)
-    f = open('jit.txt', 'w')        #open text-file for JITs
+    f = open('G_CMD.txt', 'w')        #open text-file for JITs
     FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)
-    jit = PlayYard.Play(int(stringN.get()), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint, 0)
+    G_CMD = PlayYard.Play(int(stringN.get()), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint, 0)
     
-    answer.insert(INSERT, jit)
-    f.write(jit)                     #writing JITs down to the file
+    answer.insert(INSERT, G_CMD)
+    f.write(G_CMD)                     #writing JITs down to the file
     f.close()
     
 def button2_clicked():      #Gamma
@@ -105,8 +105,9 @@ def loadTB_clicked():
     answer.insert(INSERT, G_CMD)
     ftabs.close()
 
-def PrepTABs(obj): #prepares your tabs (".tb") for translating into G-cmds. returns: list[1..4]( = strings) of lists( = tacts).
+def PrepTABs(obj):  #prepares your tabs (".tab") for translating into G-cmds. returns: list[1..4]( = strings) of lists( = tacts).
                     #Deletes all useless symbols and the first symbol '-' in every tact
+                    #Better to save files in python's folder
     tacts = list()
     strings = list()
     

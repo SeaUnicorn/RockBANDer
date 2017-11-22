@@ -2,7 +2,7 @@ import helper #switch-case
 import math   #sin/cos
 import PointMod #point (position) and point modification
 
-def printer(point, vel, numberN):                                                       #a JITstring[] former
+def printer(point, vel, numberN):                                                       #a G_string[] former
     numberN = numberN + 10
     return ('N'+ str(numberN) + ' G01' + ' X=' + str(point.X) +
                     ' Y=' + str(point.Y) + ' Z=' + str(point.Z) +
@@ -10,7 +10,7 @@ def printer(point, vel, numberN):                                               
                     #' C=' + str(point.C) +
                     ' F' + str(vel)+ ' \n' )
 
-def JITMaker(mode, numberN, angleZX, angleZY, point, vel, crossing): #crossing is a integer, using to make lazy string crossing (without too many actions)
+def G_Maker(mode, numberN, angleZX, angleZY, point, vel, crossing): #crossing is a integer, using to make lazy string crossing (without too many actions)
     pointShift = PointMod.pointShift(0,0,10)                                              #just creating an obj
     point = PointMod.Modification(point, pointShift, angleZX, angleZY)
     G_CMD = '' #resulting string

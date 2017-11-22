@@ -1,7 +1,7 @@
 import helper #switch-case 
 import math   #sin/cos, abs
 import PointMod #point (position) and point modification
-import JitCom
+import G_Com
 import copy
 
 S = list()
@@ -39,27 +39,27 @@ def Load(angleZX, angleZY, NumberN, mode, point):
      pick = Pick(point.X, point.Y, point.Z, 1, mode)
 
 def Play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing):
-    jit = ''
+    G_CMD = ''
     Load(angleZX, angleZY, NumberN, mode, point)
-    jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], 10000, crossing) #the angle changes clockwise
-    return jit
+    G_CMD = G_CMD + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], 50000, crossing) #the angle changes clockwise
+    return G_CMD
     
 
 def TabsProc(tabs, angleZX, angleZY, NumberN, mode, point):
     Load(angleZX, angleZY, NumberN, mode, point)
-    jit = ''
+    G_CMD  = ''
     crossing = 1
     for x in range(0, len(tabs)):
             #jit = jit+ str(tabs[x]) +'\n'
-            jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 10000, crossing) #the angle changes clockwise
+            G_CMD  = G_CMD  + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 50000, crossing) #the angle changes clockwise
             if x < (len(tabs)-1):
                 while math.fabs(tabs[x+1] - tabs[x])>1:
                     tabs[x] = int(math.copysign(1,(tabs[x+1] - tabs[x]))*1+tabs[x])
                     crossing = 2
-                    jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 10000, crossing) #the angle changes clockwise
+                    G_CMD  = G_CMD  + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 50000, crossing) #the angle changes clockwise
                     crossing = 0
             if x == 0: crossing = 0
-    return jit
+    return G_CMD
 
 
 
@@ -85,7 +85,7 @@ def CheckForNote(strings):
                 if case(2):
                     
                     
-                    for y in range(0, 4):
+                    for y in range(0, 4): #calculating duration
                         temp = strings[y][l]
                         if temp[x].isdigit() == True or (x == len(strings[y][l])-1 and l == len(strings[0])-1) and CMDs[len(CMDs)-1].duration == 0:
                             
@@ -94,19 +94,19 @@ def CheckForNote(strings):
                             duration = int(duration/100)
                             for case in helper.switch(duration):
                                 if case(6):
-                                    CMDs[len(CMDs)-1].__edit__(4000)
+                                    CMDs[len(CMDs)-1].__edit__(4000) #semibreve
                                     break
                                 if case(5):
-                                    CMDs[len(CMDs)-1].__edit__(2000)
+                                    CMDs[len(CMDs)-1].__edit__(2000) #minim
                                     break
                                 if case(4):
-                                    CMDs[len(CMDs)-1].__edit__(1000)
+                                    CMDs[len(CMDs)-1].__edit__(1000) #crotchet
                                     break
                                 if case(3):
-                                    CMDs[len(CMDs)-1].__edit__(500)
+                                    CMDs[len(CMDs)-1].__edit__(500)  #quaver
                                     break
                                 if case(2):
-                                    CMDs[len(CMDs)-1].__edit__(250)
+                                    CMDs[len(CMDs)-1].__edit__(250)  #semiquaver
                                     break
                                 if case():
                                     CMDs[len(CMDs)-1].__edit__(4000)
@@ -120,7 +120,7 @@ def CheckForNote(strings):
 
                             
                                         
-                if case(1):
+                if case(1):                         #found the note
                     for y in range(0, 4):
                         temp = strings[y][l]
                         if temp[x].isdigit() == True:
@@ -136,17 +136,17 @@ def CheckForNote(strings):
 def PlayTabs(strings, angleZX, angleZY, NumberN, mode, point):
     global CMDs
     CMDs = list()
-    jit =''
+    G_CMD =''
     CheckForNote(strings)
     picks = list()
     for item in CMDs:
         picks.append(item.string)
         
     for item in range(0, len(CMDs)):
-        jit = jit + (str('M'+str(CMDs[item].string*100 + CMDs[item].note) + ' \n'))
-        jit = jit + (Play(CMDs[item].string, angleZX, angleZY, NumberN, mode, point, 1))
-        jit = jit + (str('MW1 = X M' + str(CMDs[item].duration)+ ' \n'))
+        G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + ' \n'))
+        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, NumberN, mode, point, 1))
+        G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') + (str('MF1 = ' + str(CMDs[item].duration)+ ' \n'))
 
-    return jit
+    return G_CMD
 
 
