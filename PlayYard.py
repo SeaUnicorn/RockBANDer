@@ -1,7 +1,7 @@
 import helper #switch-case 
 import math   #sin/cos, abs
 import PointMod #point (position) and point modification
-import JitCom
+import G_Com
 import copy
 
 S = list()
@@ -32,34 +32,34 @@ def Crossing(Strings, PositionLast, PositionNext):
         if b-k*PositionNext.X - PositionNext.Y > 0:
             return 1
     return 0
-def Load(angleZX, angleZY, NumberN, mode, point):
+def Load(angleZX, angleZY, mode, point):
      global S
      FirstString = copy.deepcopy(point) # set first point here(highest string)
      S = Strings(FirstString, angleZX, angleZY)
      pick = Pick(point.X, point.Y, point.Z, 1, mode)
 
-def Play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing):
-    jit = ''
-    Load(angleZX, angleZY, NumberN, mode, point)
-    jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], 10000, crossing) #the angle changes clockwise
-    return jit
+def Play(stringNum, angleZX, angleZY, mode, point, crossing):
+    G_CMD = ''
+    Load(angleZX, angleZY, mode, point)
+    G_CMD = G_CMD + G_Com.G_Maker(mode, angleZX, angleZY, S[int(stringNum)-1], 20000, crossing) #the angle changes clockwise
+    return G_CMD
     
 
-def TabsProc(tabs, angleZX, angleZY, NumberN, mode, point):
-    Load(angleZX, angleZY, NumberN, mode, point)
-    jit = ''
+def TabsProc(tabs, angleZX, angleZY,  mode, point):
+    Load(angleZX, angleZY,  mode, point)
+    G_CMD  = ''
     crossing = 1
     for x in range(0, len(tabs)):
             #jit = jit+ str(tabs[x]) +'\n'
-            jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 10000, crossing) #the angle changes clockwise
+            G_CMD  = G_CMD  + G_Com.G_Maker(mode,  angleZX, angleZY, S[tabs[x]-1], 20000, crossing) #the angle changes clockwise
             if x < (len(tabs)-1):
                 while math.fabs(tabs[x+1] - tabs[x])>1:
                     tabs[x] = int(math.copysign(1,(tabs[x+1] - tabs[x]))*1+tabs[x])
                     crossing = 2
-                    jit = jit + JitCom.JITMaker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], 10000, crossing) #the angle changes clockwise
+                    G_CMD  = G_CMD  + G_Com.G_Maker(mode, angleZX, angleZY, S[tabs[x]-1], 20000, crossing) #the angle changes clockwise
                     crossing = 0
             if x == 0: crossing = 0
-    return jit
+    return G_CMD
 
 
 
@@ -85,7 +85,7 @@ def CheckForNote(strings):
                 if case(2):
                     
                     
-                    for y in range(0, 4):
+                    for y in range(0, 4): #calculating duration
                         temp = strings[y][l]
                         if temp[x].isdigit() == True or (x == len(strings[y][l])-1 and l == len(strings[0])-1) and CMDs[len(CMDs)-1].duration == 0:
                             
@@ -94,19 +94,19 @@ def CheckForNote(strings):
                             duration = int(duration/100)
                             for case in helper.switch(duration):
                                 if case(6):
-                                    CMDs[len(CMDs)-1].__edit__(4000)
+                                    CMDs[len(CMDs)-1].__edit__(4000) #semibreve
                                     break
                                 if case(5):
-                                    CMDs[len(CMDs)-1].__edit__(2000)
+                                    CMDs[len(CMDs)-1].__edit__(2000) #minim
                                     break
                                 if case(4):
-                                    CMDs[len(CMDs)-1].__edit__(1000)
+                                    CMDs[len(CMDs)-1].__edit__(1000) #crotchet
                                     break
                                 if case(3):
-                                    CMDs[len(CMDs)-1].__edit__(500)
+                                    CMDs[len(CMDs)-1].__edit__(500)  #quaver
                                     break
                                 if case(2):
-                                    CMDs[len(CMDs)-1].__edit__(250)
+                                    CMDs[len(CMDs)-1].__edit__(250)  #semiquaver
                                     break
                                 if case():
                                     CMDs[len(CMDs)-1].__edit__(4000)
@@ -120,7 +120,7 @@ def CheckForNote(strings):
 
                             
                                         
-                if case(1):
+                if case(1):                         #found the note
                     for y in range(0, 4):
                         temp = strings[y][l]
                         if temp[x].isdigit() == True:
@@ -133,20 +133,22 @@ def CheckForNote(strings):
                     pass                                                  #expecting default or exeption
                     break
             
-def PlayTabs(strings, angleZX, angleZY, NumberN, mode, point):
+def PlayTabs(strings, angleZX, angleZY, mode, point):
     global CMDs
     CMDs = list()
-    jit =''
+    G_CMD ='G101 J0=90 J1=-31 J2=106 J3=0 J4=-51 J5=0 F20000\nG01 A= -82 B= 0 C= 90 F1000\nLOOP\n'
+    pick_time = 200 #vel 20 000,  two sound points
     CheckForNote(strings)
     picks = list()
     for item in CMDs:
         picks.append(item.string)
         
     for item in range(0, len(CMDs)):
-        jit = jit + (str('M'+str(CMDs[item].string*100 + CMDs[item].note) + ' \n'))
-        jit = jit + (Play(CMDs[item].string, angleZX, angleZY, NumberN, mode, point, 1))
-        jit = jit + (str('MW1 = X M' + str(CMDs[item].duration)+ ' \n'))
+        G_CMD = G_CMD  +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + '\n'))
+        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, mode, point, 1))
+        G_CMD = G_CMD  + (str('G04 ' + str((CMDs[item].duration - pick_time)/1000)+ ' \n'))
+    G_CMD = G_CMD + 'ENDLOOP'
 
-    return jit
+    return G_CMD
 
 
