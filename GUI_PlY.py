@@ -7,13 +7,14 @@ import copy
 try:
     from tkinter import *
     from tkinter.filedialog import askopenfilename
+    from tkinter.filedialog import asksaveasfile
 except ImportError:
     from Tkinter import *
     from tkFileDialog.filedialog import askopenfilename
 
 
 root = Tk()
-
+G_CMD = 'NULL'
 jit = 'NONE'
 FP = Label (root, text ='First String Position')
 Another = Label (root, text ='angleZX        angleZY        String')
@@ -61,35 +62,29 @@ def button2_clicked():      #Gamma
     answer.insert(INSERT, "Currently under development")
     
 def load_clicked():
-    ftabs = open(askopenfilename(), 'r')
+    ftabs = asksaveasfile(mode='w', defaultextension=".txt")
     if ftabs:
             try:
                 print("""here it comes: self.settings["template"].set(fname)""")
-            except:                     # <- naked except is a bad idea
+                ftabs.write(G_CMD)
+            except:                     
                 showerror("Open Source File", "Failed to read file\n'%s'" % fname)
-            
-    FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)
-    
-    tabs = list(map(int, ftabs.readlines()))
-    
-    
-    
-    answer.delete('1.0', END)
-    answer.insert(INSERT, PlayYard.TabsProc(tabs,  float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint))
     ftabs.close()
 
 def loadTB_clicked():
+    global G_CMD
+    
     ftabs = open(askopenfilename(), 'r')
     if ftabs:
             try:
                 print("""here it comes: self.settings["template"].set(fname)""")
-            except:                     # <- naked except is a bad idea
+            except:                     
                 showerror("Open Source File", "Failed to read file\n'%s'" % fname)
             
 
     
     tabsGP = list( ftabs.readlines())
-    #tabsGP = [line.rstrip() for line in tabsGP]
+    
     tabs = list(copy.deepcopy(tabsGP))
     for t in tabsGP:
         if t.find('|') == -1:
@@ -101,30 +96,25 @@ def loadTB_clicked():
         if x<4:
             temp= tabs[x]
             tabs[x] = temp[(temp.find('|-')+1): len(temp)]
-             # tabs[tabs.index(t)].remove([0])
-            #else:
-             # tabs[tabsGP.index(t)] = ( '|'+t)
+            
 
     FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)  
-    PlayYard.PlayTabs(EasyWay(tabs), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint)
+    G_CMD = PlayYard.PlayTabs(PrepTABs(tabs), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint)
     
     answer.delete('1.0', END)
-    answer.insert(INSERT, PlayYard.PlayTabs(EasyWay(tabs), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint))
+    answer.insert(INSERT, G_CMD)
     ftabs.close()
 
-def EasyWay(obj):
-    step = len(obj)/4
+def PrepTABs(obj): #prepares your tabs (".tb") for translating into G-cmds. returns: list[1..4]( = strings) of lists( = tacts).
+                    #Deletes all useless symbols and the first symbol '-' in every tact
     tacts = list()
     strings = list()
     
-    
-        
     for y in range(0, 4):
         s = 0
         strings.append(list())
         while s < len(obj):
             temp = obj[y+s]
-            print (temp)
             tacts.append(0)
             for x in range(0, len(temp)):
                 if temp[x]=='|':
@@ -134,11 +124,6 @@ def EasyWay(obj):
                 strings[y].append(temp[tacts[x]+1: tacts[x+1]-1])
             tacts = list()
             s = s+4
-
-    for y in range(0, len(strings)):
-        for x in range(0, len(strings[y])):
-            print(strings[y][x])
-        print('\n')
     return strings
     
     
@@ -149,11 +134,11 @@ def main():
              
     root.title( 'PlayGround' )    # window parameters
     root.geometry( '800x400' )
-    #PlayYard.Load(float(angleZX.get()), float(angleZY.get()), N, 'D', PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0))
+    
     Button( root, text=' Make JITS ', command=button_clicked). grid(row = 7, column = 1, columnspan=2, pady=10)
     Button( root, text=' PVI connection ', command=button2_clicked). grid(row = 7, column = 4, columnspan=2, pady=10)
-    Button (root, text = 'Load Tabs', command = load_clicked). grid (row = 8, column = 1, columnspan=2, pady=10)
-    Button (root, text = 'Load Tabs GP', command = loadTB_clicked). grid (row = 8, column = 5, columnspan=2, pady=10)
+    Button (root, text = 'Load Tabs', command = loadTB_clicked). grid (row = 8, column = 1, columnspan=2, pady=10)
+    Button (root, text = 'Save Tabs', command = load_clicked). grid (row = 8, column = 5, columnspan=2, pady=10)
     root.mainloop()
     
 
