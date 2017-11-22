@@ -69,8 +69,11 @@ class CMD_TAB:
           self.note = note
           self.string = string
           self.duration = 0
+          self.crossing = 1
     def __edit__(self, duration):
           self.duration = duration
+    def __crossing__(self, crossing):
+          self.crossing = crossing
           
     
     
@@ -126,7 +129,8 @@ def CheckForNote(strings):
                         if temp[x].isdigit() == True:
                            CMDs.append(CMD_TAB(int(temp[x]), 4 - y))
                            modeCh = 2
-                           
+                           #if len(CMDs)>1 and CMDs[len(CMDs)-2].string - CMDs[len(CMDs)-1].string == 1:
+                            #   CMDs[len(CMDs)-2].crossing == 0
                            break
                     break
                 if case():
@@ -136,7 +140,7 @@ def CheckForNote(strings):
 def PlayTabs(strings, angleZX, angleZY, mode, point):
     global CMDs
     CMDs = list()
-    G_CMD ='G101 J0=90 J1=-31 J2=106 J3=0 J4=-51 J5=0 F20000\nG01 A= -82 B= 0 C= 90 F1000\nLOOP\n'
+    G_CMD ='G101 J0=90 J1=-31 J2=106 J3=0 J4=-51 J5=0 F20000\nG01 A= -82 B= 0 C= 90 F20000\nLOOP\n'
     pick_time = 200 #vel 20 000,  two sound points
     CheckForNote(strings)
     picks = list()
@@ -145,7 +149,7 @@ def PlayTabs(strings, angleZX, angleZY, mode, point):
         
     for item in range(0, len(CMDs)):
         G_CMD = G_CMD  +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + '\n'))
-        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, mode, point, 1))
+        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, mode, point, CMDs[item].crossing))
         G_CMD = G_CMD  + (str('G04 ' + str((CMDs[item].duration - pick_time)/1000)+ ' \n'))
     G_CMD = G_CMD + 'ENDLOOP'
 
