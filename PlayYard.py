@@ -7,6 +7,7 @@ import copy
 S = list()
 duration = 0
 CMDs = list()
+Velocity = 5000
 
 def Strings(point1, angleZX, angleZY):
     pointShift = PointMod.pointShift(-20, 0, 0)
@@ -32,31 +33,31 @@ def Crossing(Strings, PositionLast, PositionNext):
         if b-k*PositionNext.X - PositionNext.Y > 0:
             return 1
     return 0
-def Load(angleZX, angleZY, mode, point):
+def Load(angleZX, angleZY, NumberN, mode, point):
      global S
      FirstString = copy.deepcopy(point) # set first point here(highest string)
      S = Strings(FirstString, angleZX, angleZY)
      pick = Pick(point.X, point.Y, point.Z, 1, mode)
 
-def Play(stringNum, angleZX, angleZY, mode, point, crossing):
+def Play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, string, note):
     G_CMD = ''
-    Load(angleZX, angleZY, mode, point)
-    G_CMD = G_CMD + G_Com.G_Maker(mode, angleZX, angleZY, S[int(stringNum)-1], 20000, crossing) #the angle changes clockwise
+    Load(angleZX, angleZY, NumberN, mode, point)
+    G_CMD = G_CMD + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, string, note) #the angle changes clockwise  Velocity
     return G_CMD
     
 
-def TabsProc(tabs, angleZX, angleZY,  mode, point):
-    Load(angleZX, angleZY,  mode, point)
+def TabsProc(tabs, angleZX, angleZY, NumberN, mode, point):
+    Load(angleZX, angleZY, NumberN, mode, point)
     G_CMD  = ''
     crossing = 1
     for x in range(0, len(tabs)):
-            #jit = jit+ str(tabs[x]) +'\n'
-            G_CMD  = G_CMD  + G_Com.G_Maker(mode,  angleZX, angleZY, S[tabs[x]-1], 20000, crossing) #the angle changes clockwise
+            
+            G_CMD  = G_CMD  + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], Velocity, crossing, stringNum, note) #the angle changes clockwise Velocity
             if x < (len(tabs)-1):
                 while math.fabs(tabs[x+1] - tabs[x])>1:
                     tabs[x] = int(math.copysign(1,(tabs[x+1] - tabs[x]))*1+tabs[x])
                     crossing = 2
-                    G_CMD  = G_CMD  + G_Com.G_Maker(mode, angleZX, angleZY, S[tabs[x]-1], 20000, crossing) #the angle changes clockwise
+                    G_CMD  = G_CMD  + G_Com.G_Maker(mode, NumberN, angleZX, angleZY, S[tabs[x]-1], Velocity, crossing, stringNum, note) #the angle changes clockwise
                     crossing = 0
             if x == 0: crossing = 0
     return G_CMD
@@ -69,11 +70,8 @@ class CMD_TAB:
           self.note = note
           self.string = string
           self.duration = 0
-          self.crossing = 1
     def __edit__(self, duration):
           self.duration = duration
-    def __crossing__(self, crossing):
-          self.crossing = crossing
           
     
     
@@ -129,29 +127,27 @@ def CheckForNote(strings):
                         if temp[x].isdigit() == True:
                            CMDs.append(CMD_TAB(int(temp[x]), 4 - y))
                            modeCh = 2
-                           #if len(CMDs)>1 and CMDs[len(CMDs)-2].string - CMDs[len(CMDs)-1].string == 1:
-                            #   CMDs[len(CMDs)-2].crossing == 0
+                           
                            break
                     break
                 if case():
                     pass                                                  #expecting default or exeption
                     break
             
-def PlayTabs(strings, angleZX, angleZY, mode, point):
+def PlayTabs(strings, angleZX, angleZY, NumberN, mode, point):
     global CMDs
     CMDs = list()
-    G_CMD ='G101 J0=90 J1=-31 J2=106 J3=0 J4=-51 J5=0 F20000\nG01 A= -82 B= 0 C= 90 F20000\nLOOP\n'
-    pick_time = 200 #vel 20 000,  two sound points
+    G_CMD ='N10 G101 J0=90 J1=-47 J2=88 J4=-73 J5=4.065 F5000 \n Loop \n'
     CheckForNote(strings)
     picks = list()
     for item in CMDs:
         picks.append(item.string)
         
     for item in range(0, len(CMDs)):
-        G_CMD = G_CMD  +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + '\n'))
-        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, mode, point, CMDs[item].crossing))
-        G_CMD = G_CMD  + (str('G04 ' + str((CMDs[item].duration - pick_time)/1000)+ ' \n'))
-    G_CMD = G_CMD + 'ENDLOOP'
+      ##  G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') +(str('M'+str(CMDs[item].string*100 + CMDs[item].note) + ' \n'))
+        G_CMD = G_CMD + (Play(CMDs[item].string, angleZX, angleZY, NumberN, mode, point, 1, CMDs[item].string, CMDs[item].note))
+        G_CMD = G_CMD + ('N'+ str(NumberN) + ' ') + (str('G04 ' + str(CMDs[item].duration/1000)+ ' \n'))
+    G_CMD = G_CMD + 'ENDLOOP \n'
 
     return G_CMD
 
