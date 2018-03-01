@@ -40,21 +40,21 @@ mode.grid(row = 6, column = 3, padx=10, pady=10)
 answer.grid(row = 3,  column = 8, padx=10, rowspan = 6, columnspan=7)
 
 X.insert(0, '60')
-Y.insert(0, '-149.09')
+Y.insert(0, '0')
 Z.insert(0, '45')
-angleZX.insert(0, '-62')
+angleZX.insert(0, '-60')
 angleZY.insert(0, '0')
-stringN.insert(0, '2')
+stringN.insert(0, '1')
 mode.insert(0, 'D')
 
 def button_clicked():
     answer.delete('1.0', END)
-    f = open('G_CMD.txt', 'w')        #open text-file for JITs
+    f = open('G_CMD.txt', 'w')        #open text-file for Gts
     FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)
-    G_CMD = PlayYard.Play(int(stringN.get()), float(angleZX.get()), float(angleZY.get()), mode.get(), FirstPoint, 0)
+    G_CMD = PlayYard.Play(int(stringN.get()), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint, 0)
     
     answer.insert(INSERT, G_CMD)
-    f.write(G_CMD)                     #writing JITs down to the file
+    f.write(G_CMD)                     #writing Gts down to the file
     f.close()
     
 def button2_clicked():      #Gamma
@@ -62,7 +62,7 @@ def button2_clicked():      #Gamma
     answer.insert(INSERT, "Currently under development")
     
 def load_clicked():
-    ftabs = asksaveasfile(mode='w', defaultextension=".cnc")
+    ftabs = asksaveasfile(mode='w', defaultextension=".txt")
     if ftabs:
             try:
                 print("""here it comes: self.settings["template"].set(fname)""")
@@ -99,7 +99,7 @@ def loadTB_clicked():
             
 
     FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)  
-    G_CMD = PlayYard.PlayTabs(PrepTABs(tabs), float(angleZX.get()), float(angleZY.get()), mode.get(), FirstPoint)
+    G_CMD = PlayYard.PlayTabs(PrepTABs(tabs), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint)
     
     answer.delete('1.0', END)
     answer.insert(INSERT, G_CMD)
