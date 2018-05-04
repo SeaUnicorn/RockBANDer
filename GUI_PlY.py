@@ -16,42 +16,42 @@ except ImportError:
 root = Tk()
 G_CMD = 'NULL'
 
-FP = Label (root, text ='First String Position')
-Another = Label (root, text ='angleZX        angleZY        String')
-X = Entry(root, width = 7)
-Y = Entry(root, width = 7)
-Z = Entry(root, width = 7)
-angleZX = Entry(root, width = 10)
-angleZY = Entry(root, width = 10)
-stringN= Entry(root, width = 10)
+position_lable = Label (root, text ='First String Position')
+slope_lable = Label (root, text ='angle_ZX        angle_ZY        String')
+position_x = Entry(root, width = 7)
+position_y = Entry(root, width = 7)
+position_z = Entry(root, width = 7)
+angle_ZX = Entry(root, width = 10)
+angle_ZY = Entry(root, width = 10)
+string_number= Entry(root, width = 10)
 mode = Entry(root, width = 10)
 answer = Text(root, width = 60, height = 20)
 
 
-FP.grid(row = 2, column = 1, columnspan=6)
-X.grid(row = 3, column = 1, pady=10)
-Y.grid(row = 3, column = 3, pady=10)
-Z.grid(row = 3, column = 5, pady=10)
-Another.grid(row = 4, column = 1, padx=10, pady=10, columnspan=6)
-angleZX.grid(row = 5, column = 1, padx=10, pady=10)
-angleZY.grid(row = 5, column = 3, padx=10, pady=10)
-stringN.grid(row = 5, column = 5, padx=10, pady=10)
+position_lable.grid(row = 2, column = 1, columnspan=6)
+position_x.grid(row = 3, column = 1, pady=10)
+position_y.grid(row = 3, column = 3, pady=10)
+position_z.grid(row = 3, column = 5, pady=10)
+slope_lable.grid(row = 4, column = 1, padx=10, pady=10, columnspan=6)
+angle_ZX.grid(row = 5, column = 1, padx=10, pady=10)
+angle_ZY.grid(row = 5, column = 3, padx=10, pady=10)
+string_number.grid(row = 5, column = 5, padx=10, pady=10)
 mode.grid(row = 6, column = 3, padx=10, pady=10)
 answer.grid(row = 3,  column = 8, padx=10, rowspan = 6, columnspan=7)
 
-X.insert(0, '60')
-Y.insert(0, '0')
-Z.insert(0, '45')
-angleZX.insert(0, '-60')
-angleZY.insert(0, '0')
-stringN.insert(0, '1')
+position_x.insert(0, '60')
+position_y.insert(0, '0')
+position_z.insert(0, '45')
+angle_ZX.insert(0, '-60')
+angle_ZY.insert(0, '0')
+string_number.insert(0, '1')
 mode.insert(0, 'D')
 
 def button_clicked():
     answer.delete('1.0', END)
     f = open('G_CMD.txt', 'w')        #open text-file for Gts
-    FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)
-    G_CMD = PlayYard.Play(int(stringN.get()), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint, 0)
+    FirstPoint = PointMod.point(float(position_x.get()), float(position_y.get()), float(position_z.get()), 0, 0, 0)
+    G_CMD = PlayYard.Play(int(string_number.get()), float(angle_ZX.get()), float(angle_ZY.get()), 10, mode.get(), FirstPoint, 0)
     
     answer.insert(INSERT, G_CMD)
     f.write(G_CMD)                     #writing Gts down to the file
@@ -98,8 +98,8 @@ def loadTB_clicked():
             tabs[x] = temp[(temp.find('|-')+1): len(temp)]
             
 
-    FirstPoint = PointMod.point(float(X.get()), float(Y.get()), float(Z.get()), 0, 0, 0)  
-    G_CMD = PlayYard.PlayTabs(PrepTABs(tabs), float(angleZX.get()), float(angleZY.get()), 10, mode.get(), FirstPoint)
+    FirstPoint = PointMod.point(float(position_x.get()), float(position_y.get()), float(position_z.get()), 0, 0, 0)  
+    G_CMD = PlayYard.PlayTabs(PrepTABs(tabs), float(angle_ZX.get()), float(angle_ZY.get()), 10, mode.get(), FirstPoint)
     
     answer.delete('1.0', END)
     answer.insert(INSERT, G_CMD)
