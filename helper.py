@@ -20,8 +20,3 @@ class switch(object):
     def case(*args):
         return any((arg == switch.value for arg in args))
 
-def DegToRad(angleDeg):
-    return (angleDeg*3.1416)/180
-
-def RadToDeg(angleRad):
-    return (angleRad*180)/3.1416
