@@ -26,18 +26,18 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
     for case in helper.switch(mode):
         
         if case('D'):   
-           # if crossing == 1 or crossing == 2 :
-               # G_CMD = G_CMD + printer(point, velocity, numberN) #string coord + z +10 mm
+            if crossing == 1 or crossing == 2 :
+                G_CMD = G_CMD + printer(point, velocity, numberN) #string coord + z +10 mm
             if crossing != 2:
                 pointShift.__edit__(5, 0, -10)                                    #a pick goes down/ shift (dependes on the strings' positions)
-               # G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)#creating new JITstring[] about new pick_position
+                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)#creating new JITstring[] about new pick_position
                 #
                 if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
                 #
                 pointShift.__edit__(0, 0, -5)
-                #G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
+                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
                 pointShift.__edit__(-10, 0, 10)
-                #G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
+                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
             break;
     
         if case('U'):

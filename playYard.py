@@ -177,7 +177,7 @@ def g_check_note(tabs):
 def play_TABs(g_Inf):
     global CMDs
     CMDs = list()
-    G_CMD ='N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 J5=4.065 F5000 \ndef UDINT duration \nduration =' + str(g_Inf.duration*1000) +' \n Loop \n'
+    G_CMD ='N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 J5=4.065 F5000 \nM500 \ndef UDINT duration \nduration =' + str(g_Inf.duration*1000) +' \n Loop \n'
     #g_check_note(g_Inf.tabs)
     g_form_cmd(g_Inf.tabs)
     #CMD
