@@ -23,15 +23,61 @@ def printerSpl (point):
 
 def printerCircus(direction, point, angle, numberN):
     numberN = numberN + 10
-    return ('N'+ str(numberN) + ' ' + str(direction) + ' I'+ str(round(point.X, 3)) + ' K' + str(round(point.Z, 3)) + ' H' +str(angle)+ ' \n')
+    return ('N'+ str(numberN) + ' ' + str(direction)+ ' G161' + ' I'+ str(round(point.X, 3)) + ' K' + str(round(point.Z, 3)) + ' H' +str(angle)+ ' \n')
 
+def printerRadius(point, radius):
+    return ('G161 ' +'X'+str(round(point.X, 3)) + ' Z'+ str(round(point.Z, 3))+ ' R=' + str(radius) + ' \n')  
+
+def crossing(mode, NumberN, angleZX, angleZY, string, stringL, Velocity):
+    G_CMD = '' #resulting string
+    pointShift = point_Mod.pointShift(0,0,0)
+    point_Mod.modification(string, pointShift, angleZX, angleZY)
+    if string!= stringL:
+      print('string X = ' + str(string.X) + ' Z = ' + str(string.Z))
+      for case in helper.switch(mode):
+        if case('D'):
+            pointShift.__edit__(10, 0, 0)
+            point_Mod.modification(string, pointShift, angleZX, angleZY)
+            R = round((helper.distance(string, stringL)/2)*(-5), 3)
+            G_CMD = G_CMD + 'G03 ' + printerRadius(string, R) 
+            
+            print('start D X = ' + str(string.X) + ' Z = ' + str(string.Z))
+            print('before X = ' + str(stringL.X) + ' Z = ' + str(stringL.Z))
+            break
+        if case('U'):
+            pointShift.__edit__(-10, 0, 0)
+            point_Mod.modification(string, pointShift, angleZX, angleZY)
+            R = round((helper.distance(string, stringL)/2)*(-5), 3)
+            G_CMD = G_CMD + 'G03 ' + printerRadius(string, R)
+            print('start U X = ' + str(string.X) + ' Z = ' + str(string.Z))
+            print('before X = ' + str(stringL.X) + ' Z = ' + str(stringL.Z))
+            break
+        
+    
+    return G_CMD
+    
+    
+
+def startPoint(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, note):
+    pointShift = point_Mod.pointShift(0,0,0)                                              #just creating an obj
+    point = point_Mod.modification(point, pointShift, angleZX, angleZY)
+    G_CMD = '' #resulting string
+    for case in helper.switch(mode):
+        if case('D'):
+            pointShift.__edit__(10, 0, 0)
+            G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) 
+            break
+        if case('U'):
+            pointShift.__edit__(-10, 0, 0)
+            G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) #string coord + z +10 mm
+            break
+        if case():
+            pass                                                  #expecting default or exeption
+            break
+    return G_CMD   
+        
 
 def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, note): #crossing is a integer, using to make lazy string crossing (without too many actions)
-    #new
-    
-    
-    
-    
     
     pointShift = point_Mod.pointShift(0,0,0)                                              #just creating an obj
     point = point_Mod.modification(point, pointShift, angleZX, angleZY)
@@ -41,42 +87,24 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
     for case in helper.switch(mode):
         
         if case('D'):
-            pointShift.__edit__(10, 0, 0)
-            G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) #string coord + z +10 mm
-            pointShift.__edit__(-10, 0, 35)
+            #pointShift.__edit__(10, 0, 0)
+            #G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) 
+            pointShift.__edit__(-10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            
-            G_CMD = G_CMD + printerCircus('G03', point, 32, numberN)
-            break;
+            G_CMD = G_CMD + 'G02 ' + printerRadius(point, 50)
+            break
     
         if case('U'):
-            pointShift.__edit__(-10, 0, 0)
-            G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) #string coord + z +10 mm
-            pointShift.__edit__(10, 0, 35)
+            #pointShift.__edit__(-10, 0, 0)
+            #G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN) #string coord + z +10 mm
+            pointShift.__edit__(10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            
-            G_CMD = G_CMD + printerCircus('G02', point, 32, numberN)
-            break;
+            G_CMD = G_CMD + 'G03 ' + printerRadius(point, 50)
+            break
     
-        if case('DU'):
-            if crossing == 1 or crossing == 2 :
-                G_CMD = G_CMD + printer(point, velocity, numberN) #string coord + z +10 mm
-            if crossing != 2:
-                pointShift.__edit__(5, 0, -10)                                    #a pick goes downup/ shift (dependes on the strings' positions)
-                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)#creating new JITstring[] about new pick_position
-                pointShift.__edit__(0, 0, -7.5)                                   #a pick goes down then goes up
-                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
-                #
-                if note!=0: G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n'))
-                #
-
-                pointShift.__edit__(-10, 0, 0)
-                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
-                pointShift.__edit__(10, 0, 13.5)
-                G_CMD = G_CMD + printer(point_Mod.modification(point, pointShift, angleZX, angleZY), velocity, numberN)
-            break;
+        
         if  case('P'):
             if note!=0: G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n'))
         

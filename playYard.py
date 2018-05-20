@@ -66,6 +66,16 @@ def play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, string, no
     Load(angleZX, angleZY, NumberN, mode, point)
     G_CMD = G_CMD + g_cmd.g_maker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, string, note) #the angle changes clockwise  Velocity
     return G_CMD
+
+def playStart(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, string, note):
+    Load(angleZX, angleZY, NumberN, mode, point)
+    return str(g_cmd.startPoint(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, string, note)) #the angle changes clockwise  Velocity
+
+def jump(string, stringL, mode,  angleZX, angleZY, NumberN, point):
+    G_CMD = ''
+    Load(angleZX, angleZY, NumberN, mode, point)
+    G_CMD = G_CMD + g_cmd.crossing(mode, NumberN, angleZX, angleZY, S[int(string)-1], S[int(stringL)-1], Velocity) #the angle changes clockwise  Velocity
+    return G_CMD
    
     
 def g_form_cmd(tabs):
@@ -202,7 +212,17 @@ def play_TABs(g_Inf):
             mode = 'U'
         
         if g_Inf.mode  == 'P' or CMDs[item].note == 999: mode = 'P'
-        print(mode)
+        if item == 0:
+            if CMDs[item].string > CMDs[item + 1].string:
+                mode == 'D'
+            print(mode)
+            G_CMD = G_CMD + (playStart(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].string, CMDs[item].note))
+        else:
+            print(mode)
+            G_CMD = G_CMD + (jump(CMDs[item].string, CMDs[item-1].string, mode,  g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, g_Inf.first_point))  
+           
+        
+        
         G_CMD = G_CMD + (play(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].string, CMDs[item].note))
         G_CMD = G_CMD + ('N'+ str(g_Inf.JIT_N) + ' ') + (str('M' + str(500 + int(CMDs[item].duration*64))+ '\n \n'))
     G_CMD = G_CMD + 'N10 M100 \nN10 M200 \nN10 M300 \nN10 M400 \n'
