@@ -197,7 +197,7 @@ def play_TABs(g_Inf):
     global CMDs
     CMDs = list()
     mode = 'D'
-    G_CMD ='N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 F5000 \nM500 \ndef UDINT duration \nduration = ' + str(g_Inf.duration*1000) +' \n Loop \n'
+    G_CMD ='N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 F5000 \nM500 \nG18 \ndef UDINT duration \nduration = ' + str(g_Inf.duration*1000) +' \n Loop \n'
     #g_check_note(g_Inf.tabs)
     g_form_cmd(g_Inf.tabs)
     #CMD
@@ -226,6 +226,7 @@ def play_TABs(g_Inf):
         G_CMD = G_CMD + (play(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].string, CMDs[item].note))
         G_CMD = G_CMD + ('N'+ str(g_Inf.JIT_N) + ' ') + (str('M' + str(500 + int(CMDs[item].duration*64))+ '\n \n'))
     G_CMD = G_CMD + 'N10 M100 \nN10 M200 \nN10 M300 \nN10 M400 \n'
+    G_CMD = G_CMD + 'N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 F5000 \nM500 \nG18 \ndef UDINT duration \nduration = ' + str(g_Inf.duration*1000) +' \n Loop \n'
     G_CMD = G_CMD + 'ENDLOOP \n'
 
     return G_CMD
