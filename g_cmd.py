@@ -92,7 +92,7 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
             pointShift.__edit__(-10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            G_CMD = G_CMD + 'G02 ' + printerRadius(point, 50)
+            G_CMD = G_CMD + 'G03 ' + printerRadius(point, 50)
             break
     
         if case('U'):
@@ -101,7 +101,7 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
             pointShift.__edit__(10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            G_CMD = G_CMD + 'G03 ' + printerRadius(point, 50)
+            G_CMD = G_CMD + 'G02 ' + printerRadius(point, 50)
             break
     
         
