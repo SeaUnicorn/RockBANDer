@@ -39,7 +39,7 @@ def crossing(mode, NumberN, angleZX, angleZY, string, stringL, Velocity):
             pointShift.__edit__(10, 0, 0)
             point_Mod.modification(string, pointShift, angleZX, angleZY)
             R = round((helper.distance(string, stringL))*(25/30), 3)
-            G_CMD = G_CMD + 'G03 ' + printerRadius(string, R) 
+            G_CMD = G_CMD + 'G02 ' + printerRadius(string, R) 
             
             print('start D X = ' + str(string.X) + ' Z = ' + str(string.Z))
             print('before X = ' + str(stringL.X) + ' Z = ' + str(stringL.Z))
@@ -48,7 +48,7 @@ def crossing(mode, NumberN, angleZX, angleZY, string, stringL, Velocity):
             pointShift.__edit__(-10, 0, 0)
             point_Mod.modification(string, pointShift, angleZX, angleZY)
             R = round((helper.distance(string, stringL))*(25/30), 3)
-            G_CMD = G_CMD + 'G02 ' + printerRadius(string, R)
+            G_CMD = G_CMD + 'G03 ' + printerRadius(string, R)
             print('start U X = ' + str(string.X) + ' Z = ' + str(string.Z))
             print('before X = ' + str(stringL.X) + ' Z = ' + str(stringL.Z))
             break
@@ -92,7 +92,7 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
             pointShift.__edit__(-10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            G_CMD = G_CMD + 'G03 ' + printerRadius(point, 50)
+            G_CMD = G_CMD + 'G02 ' + printerRadius(point, 50)
             break
     
         if case('U'):
@@ -101,7 +101,7 @@ def g_maker(mode, numberN, angleZX, angleZY, point, velocity, crossing, string, 
             pointShift.__edit__(10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
             if note != 0 :  G_CMD = G_CMD + ('N'+ str(numberN) + ' ') +(str('M'+str(string*100 + note) + ' \n')) 
-            G_CMD = G_CMD + 'G02 ' + printerRadius(point, 50)
+            G_CMD = G_CMD + 'G03 ' + printerRadius(point, 50)
             break
     
         
