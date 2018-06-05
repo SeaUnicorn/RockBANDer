@@ -23,3 +23,9 @@ class switch(object):
         return any((arg == switch.value for arg in args))
 def distance(point1, point2):
     return math.sqrt((point1.X - point2.X)*(point1.X - point2.X) + (point1.Y - point2.Y)*(point1.Y - point2.Y) + (point1.Z - point2.Z)*(point1.Z - point2.Z) )
+
+def invert_mode(mode):
+    if mode == 'D': 
+        return 'U'
+    else:
+        return 'D'

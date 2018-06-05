@@ -2,6 +2,7 @@ import helper #switch-case
 import point_Mod #point (position) and point modification
 import g_cmd
 import copy
+from xml.dom import minidom #parsing XML
 
 S = list()
 duration = 0
@@ -11,15 +12,16 @@ Velocity = 5000
 
 
 class CMD_TAB:
-    def __init__(self, note, string):
+    def __init__(self, note, string, duration):
           self.note = note
           self.string = string
-          self.duration = 0
+          self.duration = duration
     def __edit__(self, duration):
           self.duration = duration
     def edit_note (self, note, string):
           self.note = note
           self.string = string
+
 
           
 
@@ -55,25 +57,27 @@ def Crossing(Strings, PositionLast, PositionNext):
         if b-k*PositionNext.X - PositionNext.Y > 0:
             return 1
     return 0
-def Load(angleZX, angleZY, NumberN, mode, point):
+def Load(angleZX, angleZY, point):
      global S
      FirstString = copy.deepcopy(point) # set first point here(highest string)
      S = Strings(FirstString, angleZX, angleZY)
      #pick = Pick(point.X, point.Y, point.Z, 1, mode)
 
-def play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, string, note):
+def play(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, note):
     G_CMD = ''
-    Load(angleZX, angleZY, NumberN, mode, point)
-    G_CMD = G_CMD + g_cmd.g_maker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, string, note) #the angle changes clockwise  Velocity
+    Load(angleZX, angleZY, point)
+    G_CMD = G_CMD + g_cmd.g_maker(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, int(stringNum), note) #the angle changes clockwise  Velocity
     return G_CMD
 
 def playStart(stringNum, angleZX, angleZY, NumberN, mode, point, crossing, string, note):
-    Load(angleZX, angleZY, NumberN, mode, point)
+    Load(angleZX, angleZY, point)
     return str(g_cmd.startPoint(mode, NumberN, angleZX, angleZY, S[int(stringNum)-1], Velocity, crossing, string, note)) #the angle changes clockwise  Velocity
+
+
 
 def jump(string, stringL, mode,  angleZX, angleZY, NumberN, point):
     G_CMD = ''
-    Load(angleZX, angleZY, NumberN, mode, point)
+    Load(angleZX, angleZY, point)
     G_CMD = G_CMD + g_cmd.crossing(mode, NumberN, angleZX, angleZY, S[int(string)-1], S[int(stringL)-1], Velocity) #the angle changes clockwise  Velocity
     return G_CMD
    
@@ -123,12 +127,12 @@ def g_form_cmd(tabs):
                             if temp[x+1].isdigit() == True: 
                                 tonality += temp[x+1]
                                 x +=1
-                            CMDs.append(CMD_TAB(int(tonality), 4 - y))
+                            CMDs.append(CMD_TAB(int(tonality), 4 - y), 0)
                             phase = 2
                             break
                         if temp[x] == 'P' or temp[x] == 'p':
                             tonality = '999'
-                            CMDs.append(CMD_TAB(int(tonality), 4 - y))
+                            CMDs.append(CMD_TAB(int(tonality), 4 - y), 0)
                             phase = 2
                             break
                         #if x == len(tabs[0][tact])- 1 and y == 3:
@@ -191,6 +195,23 @@ def g_check_note(tabs):
                 if case():
                     pass                                                  #expecting default or exeption
                     break
+                
+def parse_XML(notes):
+    global CMDs
+    for n in notes:
+        rest = n.getElementsByTagName('rest')
+        if len(rest)!=0:
+            fret = 999
+            string  = 0
+        else:
+            frets = n.getElementsByTagName('fret')
+            fret = frets[0].firstChild.data
+            strings = n.getElementsByTagName('string')
+            string = strings[0].firstChild.data
+        durations =  n.getElementsByTagName('duration')
+        duration = float(durations[0].firstChild.data)/3840.0
+        CMDs.append(CMD_TAB(int(fret), int(string), duration))
+                
             
             
 def play_TABs(g_Inf):
@@ -216,14 +237,14 @@ def play_TABs(g_Inf):
             if CMDs[item].string > CMDs[item + 1].string:
                 mode == 'D'
             print(mode)
-            G_CMD = G_CMD + (playStart(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].string, CMDs[item].note))
+            G_CMD = G_CMD + (playStart(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1,  CMDs[item].note))
         else:
             print(mode)
             G_CMD = G_CMD + (jump(CMDs[item].string, CMDs[item-1].string, mode,  g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, g_Inf.first_point))  
            
         
         
-        G_CMD = G_CMD + (play(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].string, CMDs[item].note))
+        G_CMD = G_CMD + (play(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.JIT_N, mode, g_Inf.first_point, 1, CMDs[item].note))
         G_CMD = G_CMD + ('N'+ str(g_Inf.JIT_N) + ' ') + (str('M' + str(500 + int(CMDs[item].duration*64))+ '\n \n'))
     G_CMD = G_CMD + 'N10 M100 \nN10 M200 \nN10 M300 \nN10 M400 \n'
     G_CMD = G_CMD + 'N10 G101 J0=90 J1=-47 J2=88 J4=-73 \n'
@@ -231,4 +252,66 @@ def play_TABs(g_Inf):
 
     return G_CMD
 
+def start_Point(g_Inf):
+    global CMDs
+    G_CMD = '' 
+    Load(g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.first_point)
+    for item in range(0, len(CMDs)):
+        if CMDs[item].note != 999:
+            G_CMD = G_CMD + str(g_cmd.startPoint(0, g_Inf.angle_ZX, g_Inf.angle_ZY, S[int(CMDs[item].string)-1], Velocity)) #the angle changes clockwise  Velocity
+            break
+    return G_CMD
 
+def crossing(mode_last, string_last, mode, string, g_Inf):
+    
+    Load(g_Inf.angle_ZX, g_Inf.angle_ZY, g_Inf.first_point)
+    if string_last < string: jump_mode = 1
+    else: jump_mode = 2
+    return str(g_cmd.jump(S[int(string_last)-1], mode_last, S[int(string)-1], helper.invert_mode(mode), g_Inf.angle_ZX, g_Inf.angle_ZY, jump_mode) )
+
+def play_TABs_XML(g_Inf):
+    global CMDs
+    CMDs = list()
+    mode_last ='U'
+    string_last = 5
+    starting = False
+    mode = 'D'
+    parse_XML(g_Inf.tabs)
+    G_CMD ='N10 M499 \nN10 G101 J0=90 J1=-47 J2=88 J4=-73 F5000  \nG18 \ndef UDINT duration \nduration = ' + str(g_Inf.duration) +' \n Loop \n'
+    G_CMD = G_CMD + start_Point(g_Inf)
+    G_CMD = G_CMD + 'M500 \n'
+    for item in range(0, len(CMDs)):
+        if item == 0:
+            mode_last = mode
+            string_last = CMDs[item].string
+        else:
+            if CMDs[item].note != 999:
+                
+                if string_last == CMDs[item].string:
+                    mode = helper.invert_mode(mode_last)
+                    mode_last = mode
+            
+                elif CMDs[item].string > string_last:
+                    mode = 'D'
+                    if starting == True: G_CMD = G_CMD + crossing(mode_last, string_last, mode, CMDs[item].string, g_Inf)
+                    else: starting = True 
+                    mode_last = mode
+                    string_last = CMDs[item].string
+                    
+                elif CMDs[item].string < string_last:
+                    mode = 'U'
+                    if starting == True: G_CMD = G_CMD + crossing(mode_last, string_last, mode, CMDs[item].string, g_Inf)
+                    else: starting = True
+                    mode_last = mode
+                    string_last = CMDs[item].string
+                     
+        if g_Inf.mode  == 'P' or CMDs[item].note == 999: mode = 'P'
+        G_CMD = G_CMD + (play(CMDs[item].string, g_Inf.angle_ZX, g_Inf.angle_ZY, int(g_Inf.JIT_N)+item, mode, g_Inf.first_point, 1, CMDs[item].note))
+        G_CMD = G_CMD + ('N'+ str(g_Inf.JIT_N + item) + ' ') + (str('M' + str(500 + int(CMDs[item].duration*64))+ '\n \n'))
+    G_CMD = G_CMD + 'M532 \n'
+    G_CMD = G_CMD + 'M100 \nM200 \nM300 \nM400 \n'
+    G_CMD = G_CMD + 'M532 \n'
+    G_CMD = G_CMD + 'G101 J0=90 J1=-47 J2=88 J4=-73 \n'
+    G_CMD = G_CMD + 'ENDLOOP \n'
+
+    return G_CMD

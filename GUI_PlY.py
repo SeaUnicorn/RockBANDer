@@ -2,6 +2,7 @@ import point_Mod #point (position) and point modification
 import playYard
 import g_cmd
 import copy
+from xml.dom import minidom
 try:
     from tkinter import *
     from tkinter.filedialog import askopenfilename
@@ -92,7 +93,30 @@ def loadTB_button():
     
     result_JIT.delete('1.0', END)
     result_JIT.insert(INSERT, jit_CMD)
+
+def loadXML_button():
+    global jit_CMD
+     
+    file_tabs = open(askopenfilename(), 'r')
+    if file_tabs:
+            try:
+                print("""here it comes: self.settings["template"].set(fname)""")
+            except:                     
+                showerror("Open Source File", "Failed to read file\n'%s'" % fname)
+                
+    xmldoc = minidom.parse(file_tabs)   
+    sound_tempo = xmldoc.getElementsByTagName('sound')
+    sound_tempo = int (60000 / (int(sound_tempo[0].getAttribute("tempo"))/4)) #duration of whole in ms
+    notes = xmldoc.getElementsByTagName('note')
     
+    
+    file_tabs.close()
+    first_point = point_Mod.point(float(position_x.get()), float(position_y.get()), float(position_z.get()), 0, 0, 0)  
+    g_Inf = g_cmd.guitar_Info(notes, float(angle_ZX.get()), float(angle_ZY.get()), 10, punch_mode.get(), first_point, sound_tempo)
+    jit_CMD = playYard.play_TABs_XML(g_Inf)
+    
+    result_JIT.delete('1.0', END)
+    result_JIT.insert(INSERT, jit_CMD)
 
 def prep_TABs(tabs):  #prepares your tabs (".tab") for translating into J-cmds. returns: list[1..4]( = strings) of lists( = tacts).
                     #Deletes all useless symbols and the first symbol '-' in every tact
@@ -127,6 +151,7 @@ def main():
 
    
     Button(root, text=' OPC UA connection ', command=connection_button).grid(row = 7, column = 4, columnspan=2, pady=10)
+    Button(root, text=' Load XML ', command=loadXML_button).grid(row = 7, column = 1, columnspan=2, pady=10)
     Button(root, text = 'Load Tabs', command=loadTB_button).grid(row = 8, column = 1, columnspan=2, pady=10)
     Button(root, text = 'Save Tabs', command=save_button).grid(row = 8, column = 5, columnspan=2, pady=10)
     
