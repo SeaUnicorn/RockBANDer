@@ -60,29 +60,40 @@ def crossing(mode, NumberN, angleZX, angleZY, string, stringL, Velocity):
 
 def jump(point_last, mode_last, point, mode, angleZX, angleZY, jump_mode):
     G_CMD = '' #resulting string
+    
     pointShift = point_Mod.pointShift(0,0,0)                                              #just creating an obj
-    point = point_Mod.modification(point, pointShift, angleZX, angleZY)
-
-    point_last = point_Mod.modification(point_last, pointShift, angleZX, angleZY)
+    point_Mod.modification(point, pointShift, angleZX, angleZY)
+    
+    point_Mod.modification(point_last, pointShift, angleZX, angleZY)
     
     for case in helper.switch(mode_last):
         if case('D'):
             pointShift.__edit__(-10, 0, 0)
             point_last = point_Mod.modification(point_last, pointShift, angleZX, angleZY)
+            
+            break
         if case('U'):
             pointShift.__edit__(10, 0, 0)
             point_last = point_Mod.modification(point_last, pointShift, angleZX, angleZY)
+            
+            break
             
     for case in helper.switch(mode):
         
         if case('D'):
             pointShift.__edit__(-10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
+            
+            break
         if case('U'):
             pointShift.__edit__(10, 0, 0)
             point = point_Mod.modification(point, pointShift, angleZX, angleZY)
+            
+            break
+    
     if helper.distance(point, point_last) > 10:
-        R = round(helper.distance(point, point_last)*(25/30), 3)
+        R = round(helper.distance(point, point_last)*(50/20), 3)
+        
         if R < 11: R = 11
         if jump_mode == 1:
            G_CMD = G_CMD + 'G02 ' + printerRadius(point, R)  

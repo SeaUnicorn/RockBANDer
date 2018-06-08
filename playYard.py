@@ -207,7 +207,7 @@ def parse_XML(notes):
             frets = n.getElementsByTagName('fret')
             fret = frets[0].firstChild.data
             strings = n.getElementsByTagName('string')
-            string = strings[0].firstChild.data
+            string =  5 - int(strings[0].firstChild.data)
         durations =  n.getElementsByTagName('duration')
         duration = float(durations[0].firstChild.data)/3840.0
         CMDs.append(CMD_TAB(int(fret), int(string), duration))
